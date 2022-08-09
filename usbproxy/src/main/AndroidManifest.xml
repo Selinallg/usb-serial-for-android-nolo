@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sharedUserId="com.nolovr.core"
-    package="com.nolovr.core.usbproxy">
+    package="com.nolovr.core.usbproxy"
+    android:sharedUserId="com.nolovr.core">
+
     <uses-permission android:name="android.hardware.usb.host" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <uses-feature android:name="android.hardware.usb.host" />
 
     <application
-
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -14,23 +16,28 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Usbserialforandroidnolo">
 
+        <service
+            android:process=":core"
+            android:name=".ProxyService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+
         <activity
             android:name=".SplashActivity"
             android:excludeFromRecents="true"
             android:exported="true"
             android:theme="@style/AppTheme_Transparent">
-
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
-
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:exported="true">

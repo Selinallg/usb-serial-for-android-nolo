@@ -18,6 +18,10 @@ class CustomProber {
         //customTable.addProduct(0x16d0, 0x087e, CdcAcmSerialDriver.class); // e.g. Digispark CDC
 
         customTable.addProduct(0x1915, 0x520F, CdcAcmSerialDriver.class); // e.g. Digispark CDC
+        customTable.addProduct(0x248A, 0x880C, CdcAcmSerialDriver.class); // e.g. Digispark CDC
+        customTable.addProduct(0x880C, 0x248A, CdcAcmSerialDriver.class); // e.g. Digispark CDC
+        customTable.addProduct(9354, 34828 , CdcAcmSerialDriver.class); // e.g. Digispark CDC
+        customTable.addProduct(34828, 9354 , CdcAcmSerialDriver.class); // e.g. Digispark CDC
         return new UsbSerialProber(customTable);
     }
 

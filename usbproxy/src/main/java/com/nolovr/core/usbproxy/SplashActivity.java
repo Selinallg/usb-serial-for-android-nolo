@@ -1,6 +1,7 @@
 package com.nolovr.core.usbproxy;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -12,6 +13,16 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        Intent proxy = new Intent(this.getApplicationContext(), ProxyService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(proxy);
+        } else {
+            startService(proxy);
+        }
+
+
         Intent intent = getIntent();
         String action = intent.getAction();
         Log.d(TAG, "onCreate: action="+action);

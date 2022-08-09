@@ -9,6 +9,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,6 +29,7 @@ import usbserial.driver.UsbSerialProber;
 
 public class DevicesFragment extends ListFragment {
 
+    private static final String TAG = "DevicesFragment";
     static class ListItem {
         UsbDevice device;
         int port;
@@ -130,6 +133,8 @@ public class DevicesFragment extends ListFragment {
         UsbSerialProber usbCustomProber = CustomProber.getCustomProber();
         listItems.clear();
         for(UsbDevice device : usbManager.getDeviceList().values()) {
+
+            Log.d(TAG, "refresh: "+device.getProductId() +"| "+device.getVendorId());
             UsbSerialDriver driver = usbDefaultProber.probeDevice(device);
             if(driver == null) {
                 driver = usbCustomProber.probeDevice(device);

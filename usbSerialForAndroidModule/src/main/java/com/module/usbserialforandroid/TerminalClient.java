@@ -27,7 +27,8 @@ public class TerminalClient implements SerialInputOutputManager.Listener {
         System.loadLibrary("usbtoserial");
     }
 
-    private enum UsbPermission { Unknown, Requested, Granted, Denied }
+    private static final String TAG = "TerminalClient";
+    private enum UsbPermission {Unknown, Requested, Granted, Denied}
 
     private static final String INTENT_ACTION_GRANT_USB = BuildConfig.LIBRARY_PACKAGE_NAME + ".GRANT_USB";
     private static final int WRITE_WAIT_MILLIS = 2000;
@@ -52,16 +53,19 @@ public class TerminalClient implements SerialInputOutputManager.Listener {
         this.portNum = portNum;
         this.baudRate = baudRate;
 
-        handlerThread=new HandlerThread("TerminalClient");
+        handlerThread = new HandlerThread("TerminalClient");
         handlerThread.start();
         mainLooper = new Handler(handlerThread.getLooper());
     }
 
     public interface UsbDataListener {
         public void imuData(long timestamp, short acc_X, short acc_Y, short acc_Z, short gyro_X, short gyro_Y, short gyro_Z);
+
         public void nsyncData(long timestamp);
+
         public void receive(byte[] data);
     }
+
     /*
      * Serial
      */
@@ -94,43 +98,47 @@ public class TerminalClient implements SerialInputOutputManager.Listener {
             return false;
         }
         UsbDevice device = null;
-        for(UsbDevice v : usbManager.getDeviceList().values())
-            if(v.getDeviceId() == deviceId)
+        for (UsbDevice v : usbManager.getDeviceList().values()) {
+            Log.d(TAG, "connect: "+v.getProductId() +"| "+v.getVendorId());
+            Log.d(TAG, "connect: deviceId="+deviceId);
+            if (v.getDeviceId() == deviceId) {
                 device = v;
-        if(device == null) {
+            }
+        }
+        if (device == null) {
             return false;
         }
         UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
-        if(driver == null) {
+        if (driver == null) {
             driver = CustomProber.getCustomProber().probeDevice(device);
         }
-        if(driver == null) {
+        if (driver == null) {
             return false;
         }
-        if(driver.getPorts().size() < portNum) {
+        if (driver.getPorts().size() < portNum) {
             return false;
         }
         usbSerialPort = driver.getPorts().get(portNum);
         UsbDeviceConnection usbConnection = usbManager.openDevice(driver.getDevice());
 
-        if(usbConnection == null && usbPermission == UsbPermission.Unknown && !usbManager.hasPermission(driver.getDevice())) {
+        if (usbConnection == null && usbPermission == UsbPermission.Unknown && !usbManager.hasPermission(driver.getDevice())) {
             usbPermission = UsbPermission.Requested;
             PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(mActivity, 0, new Intent(INTENT_ACTION_GRANT_USB), 0);
             usbManager.requestPermission(driver.getDevice(), usbPermissionIntent);
             return false;
         }
-        if(usbConnection == null) {
+        if (usbConnection == null) {
             if (!usbManager.hasPermission(driver.getDevice()))
-                Log.e("connect","connection failed: permission denied");
+                Log.e("connect", "connection failed: permission denied");
             else
-                Log.e("connect","connection failed: open failed");
+                Log.e("connect", "connection failed: open failed");
             return false;
         }
 
         try {
             usbSerialPort.open(usbConnection);
-      //      usbSerialPort.setParameters(baudRate, 8, 1, UsbSerialPort.PARITY_NONE);
-            if(withIoManager) {
+            //      usbSerialPort.setParameters(baudRate, 8, 1, UsbSerialPort.PARITY_NONE);
+            if (withIoManager) {
                 usbIoManager = new SerialInputOutputManager(usbSerialPort, this);
                 usbIoManager.start();
             }
@@ -144,19 +152,20 @@ public class TerminalClient implements SerialInputOutputManager.Listener {
 
     public void disconnect() {
         connected = false;
-        if(usbIoManager != null) {
+        if (usbIoManager != null) {
             usbIoManager.setListener(null);
             usbIoManager.stop();
         }
         usbIoManager = null;
         try {
             usbSerialPort.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
         usbSerialPort = null;
     }
 
     public void send(byte[] data) {
-        if(!connected) {
+        if (!connected) {
             return;
         }
         try {
@@ -168,7 +177,7 @@ public class TerminalClient implements SerialInputOutputManager.Listener {
     }
 
     public void read() {
-        if(!connected) {
+        if (!connected) {
             return;
         }
         try {
@@ -211,7 +220,7 @@ public class TerminalClient implements SerialInputOutputManager.Listener {
     }
 
     private void receive(byte[] data) {
-        if(data.length > 0) {
+        if (data.length > 0) {
             updateDatas(data);
             if (usbDataListener != null) {
                 usbDataListener.receive(data);
