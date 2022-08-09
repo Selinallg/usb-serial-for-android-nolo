@@ -1,0 +1,4 @@
+include 'usbSerialForAndroid', 'usbSerialExamples'
+include ':usbSerialForAndroidModule'
+include ':usbserialforcpp'
+include ':usbToSerial'

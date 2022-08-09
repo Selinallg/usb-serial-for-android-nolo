@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdkVersion 31
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    defaultConfig {
+        minSdkVersion 17
+        targetSdkVersion 31
+        vectorDrawables.useSupportLibrary = true
+
+        missingDimensionStrategy 'device', 'anyDevice'
+
+
+
+   //     ndk {
+    //        abiFilters  "arm64-v8a"//, "mips","armeabi-v7a"
+    //    }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.so'], dir: 'libs')
+   // implementation project(':usbSerialForAndroid')
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation project(path: ':usbSerialForAndroidModule')
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+}
