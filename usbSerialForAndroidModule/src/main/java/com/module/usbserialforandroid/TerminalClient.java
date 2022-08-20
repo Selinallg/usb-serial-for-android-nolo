@@ -235,6 +235,7 @@ public class TerminalClient implements SerialInputOutputManager.Listener {
     }
 
     public void nsyncData(long timestamp) {
+        // TODO: 2022/8/10 modify by llg
         if (usbDataListener != null) {
             usbDataListener.nsyncData(timestamp);
         }

@@ -2,7 +2,9 @@
 #include <string>
 #include "type.h"
 #include <android/log.h>
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
 #include "imudata.h"
 
 #define TAG "TerminalFragment-jni" // 这个是自定义的LOG的标识
@@ -11,6 +13,14 @@
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__) // 定义LOGW类型
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__) // 定义LOGE类型
 #define LOGF(...) __android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__) // 定义LOGF类型
+
+uint64_t GetTimeNano(clockid_t clk_id)
+{
+    struct timespec t;
+    clock_gettime(clk_id, &t);
+    uint64_t result = t.tv_sec * 1000000000LL + t.tv_nsec;
+    return result;
+}
 
 static jmethodID _method_imu = nullptr;
 static jmethodID _method_nsync = nullptr;
@@ -21,6 +31,7 @@ void setImuDataCB(nolo::ImuCallBack cb){
         _imuCallBack = cb;
     }
 }
+
 
 extern "C"
 JNIEXPORT void JNICALL   //com.module.usbserialforandroid
@@ -84,7 +95,10 @@ Java_com_module_usbserialforandroid_TerminalClient_updateDatas(JNIEnv *env, jobj
             ////////////
             nolo::NSyncData* nsync = new nolo::NSyncData(buf, bSize);
             if (_method_nsync && nsync) {
-                env->CallVoidMethod(thiz, _method_nsync, (jlong) nsync->_syncTimestamp);
+
+                //
+                //env->CallVoidMethod(thiz, _method_nsync, (jlong) nsync->_syncTimestamp);
+                env->CallVoidMethod(thiz, _method_nsync, (jlong) GetTimeNano(CLOCK_MONOTONIC));
             }
         } else {
 
