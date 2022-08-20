@@ -8,15 +8,34 @@ android {
     defaultConfig {
         applicationId "com.nolovr.core.usbproxy"
         minSdk 21
-        targetSdk 32
+        targetSdk 28
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
+    signingConfigs {
         release {
+            storeFile file('../keystore/sonicKeyStore')
+            storePassword 'nolovr'
+            keyAlias 'nolovr'
+            keyPassword 'nolovr'
+        }
+    }
+
+    buildTypes {
+
+        debug {
+            debuggable true
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+
+        release {
+            debuggable true
+            minifyEnabled false
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

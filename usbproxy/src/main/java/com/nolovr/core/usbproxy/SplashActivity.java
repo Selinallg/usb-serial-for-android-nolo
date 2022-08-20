@@ -27,8 +27,8 @@ public class SplashActivity extends AppCompatActivity {
         String action = intent.getAction();
         Log.d(TAG, "onCreate: action="+action);
         if (action.equals("android.hardware.usb.action.USB_DEVICE_ATTACHED")){
-            Intent mainIntent = new Intent(this,MainActivity.class);
-            startActivity(mainIntent);
+//            Intent mainIntent = new Intent(this,MainActivity.class);
+//            startActivity(mainIntent);
             Log.d(TAG, "onCreate: sucess");
             finish();
         }
